@@ -1,0 +1,143 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX terms: <http://www.openarchives.org/ore/terms/>
+PREFIX edm: <http://www.europeana.eu/schemas/edm/>
+PREFIX p-plan: <http://purl.org/net/p-plan#> 
+PREFIX bgn: <http://data.biographynet.nl/rdf/> 
+PREFIX my: <http://my.example/#>
+
+my:BioDesShape {
+	rdf:type [bgn:BioDes];
+	rdf:type [p-plan:Entity];
+	rdf:type [terms:Aggregation];
+	rdf:type [prov:Entity];
+	bgn:xmlFileID LITERAL;
+  	bgn:hasPersonDes @my:PersonDesShape;
+  	bgn:aggregatedPerson @my:PersonShape;
+  	bgn:hasFileDes @my:FileDesShape*;
+  	bgn:hasBioParts @my:BioPartsShape*;
+  	edm:aggregatedCHO @my:PersonShape*;
+  	bgn:version LITERAL* 
+}
+
+my:PersonDesShape {
+	rdf:type [bgn:PersonDes]*;
+	rdf:type [terms:Proxy]*;
+	(
+		bgn:personName LITERAL*
+	|
+		bgn:personName @my:PersonNameShape*
+	);
+	bgn:sex {
+		rdf:type [bgn:Sex];
+		bgn:value LITERAL
+	}*;
+	bgn:event @my:EventShape*;
+	
+	(
+		bgn:idno LITERAL *;
+	|
+		bgn:idno {
+			rdf:type [bgn:Idno];
+			bgn:type LITERAL ;
+			rdf:value LITERAL
+		}*
+	);
+	bgn:state @my:StateShape*;
+	terms:proxyFor @my:PersonShape*;
+	terms:proxyIn @my:BioDesShape*
+	
+}  
+
+my:PersonNameShape{
+	rdf:type [bgn:PersName];
+	(
+		bgn:name LITERAL*
+	|
+		bgn:name @my:nameShape*
+	);
+}
+
+my:nameShape{
+	rdf:type [bgn:Name];
+	bgn:type LITERAL;
+	rdf:value LITERAL
+}
+
+my:PersonShape{
+	rdf:type [bgn:Person];
+	rdf:type [edm:ProvidedCHO];
+	bgn:personID LITERAL 
+}
+
+my:EventShape {
+	rdf:type [bgn:Event];
+	bgn:when LITERAL*;
+	bgn:type LITERAL;
+	(	
+		bgn:place LITERAL
+	|
+		bgn:place @my:PersonDesShape
+	)
+}
+
+my:StateShape {
+	rdf:type [bgn:State];
+	bgn:type LITERAL;
+	rdf:value LITERAL*;
+	bgn:idno LITERAL*
+}
+
+my:BioPartsShape {
+	rdf:type [bgn:BioParts];
+	bgn:snippet @my:SnippetShape*;
+	bgn:text LITERAL* 
+}
+
+my:SnippetShape {
+	rdf:type [bgn:Snippet];
+	bgn:sourceId LITERAL
+}
+
+my:FileDesShape {
+	rdf:type [bgn:FileDes];
+	bgn:ref {
+			rdf:type [bgn:Ref] ;
+		    bgn:target LITERAL
+	}* ;
+	bgn:title @my:PersonDesShape*;
+	(                              
+     	bgn:publisher @my:PersonDesShape*                         
+    |                            
+      	bgn:publisher @my:PublisherShape*
+  	);
+  	(
+		bgn:idno LITERAL *;
+	|
+		bgn:idno {
+			rdf:type [bgn:Idno];
+			bgn:type LITERAL ;
+			rdf:value LITERAL
+		}*
+	);     
+	bgn:notesStmt {
+		rdf:type [bgn:NotesStmt]; 
+		bgn:note{
+			rdf:type [bgn:Note];
+			bgn:type LITERAL
+		}*
+	}*       
+}
+
+my:PublisherShape {
+	rdf:type [bgn:Publisher];
+	bgn:name LITERAL;
+	bgn:ref @my:refShape
+}
+
+my:refShape{
+	rdf:type [bgn:Ref] ;
+	bgn:target LITERAL ;
+	rdf:value LITERAL*
+}
